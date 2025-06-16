@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Middleware\AuthCheck;
+use App\Models\Authors;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+
+class AuthorController extends Controller
+{
+    public function __construct()
+    {
+        return $this->middleware(AuthCheck::class);
+    }
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $authors = Authors::orderBy('name')->get();
+        return view('authors.index', ['authors' => $authors]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('authors.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+        ]);
+
+        Authors::create($request->only('name'));
+
+        return redirect()->route('authors.index');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $author = Authors::where('id', '=', $id)->first();
+        return view('authors.edit', compact('author'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $request->validate([
+            'name' => 'required|string',
+        ]);
+
+        $author = Authors::where('id', '=', $id)->first();
+        $author->update($request->only(
+            'name'
+        ));
+
+        return redirect()->route('authors.index');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
