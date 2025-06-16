@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Middleware\AuthCheck;
 use App\Models\Authors;
 use App\Models\Books;
+use App\Models\BooksRental;
 use App\Models\Genres;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class BooksController extends Controller
 {
@@ -103,4 +107,44 @@ class BooksController extends Controller
     {
         //
     }
+
+    public function requestForm(string $id)
+    {
+        $book = Books::where('id', '=', $id)->first();
+        return view('books.form', compact('book'));
+    }
+
+    public function requestBooks(Request $request, string $id)
+    {
+        $request->validate([
+            'days' => 'required|integer|min:1'
+        ]);
+
+        $book = Books::where('id', '=', $id)->first();
+        $user = Auth::user();
+
+        BooksRental::firstOrCreate(
+            [
+                'book_id' => $book->id,
+                'user_id' => $user->id,
+            ],
+            [
+                'expected_return_date' => Carbon::now()
+                    ->addDays((int) $request->input('days'))
+                    ->toDateString(),
+                'returned_date' => null,
+                'rental_status' => 'requested',
+            ]
+        );
+
+        Books::update([
+            'availability' => false,
+        ]);
+
+        return redirect()->route('rentals.requested')->with('success', 'Book requested successfully.');
+    }
+
+    /**
+     * now return function for the code
+     */
 }

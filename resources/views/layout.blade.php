@@ -25,10 +25,15 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center space-x-4">
-                    <a href="{{ url('/books') }}" class="text-lg font-semibold text-gray-700 hover:text-gray-900">Home</a>
-                    <a href="{{ route('authors.index') }}" class="text-lg text-gray-700 hover:text-gray-900">Authors</a>
-                    <a href="{{ route('genres.index') }}" class="text-lg text-gray-700 hover:text-gray-900">Genres</a>
-                    <a href="{{ route('users.index') }}" class="text-lg text-gray-700 hover:text-gray-900">Users</a>
+                    @if (Auth::check())
+                        <a href="{{ url('/books') }}" class="text-lg font-semibold text-gray-700 hover:text-gray-900">Home</a>
+                        <a href="{{ route('authors.index') }}" class="text-lg text-gray-700 hover:text-gray-900">Authors</a>
+                        <a href="{{ route('genres.index') }}" class="text-lg text-gray-700 hover:text-gray-900">Genres</a>
+                        @if (Auth::user()->user_type === 'ADM')
+                            <a href="{{ route('users.index') }}" class="text-lg text-gray-700 hover:text-gray-900">Users</a>
+                            <a href="{{ route('rentals.index') }}" class="text-lg text-gray-700 hover:text-gray-900">Rental Details</a>
+                        @endif
+                    @endif
                 </div>
                 <div class="flex items-center">
                     <!-- Example: Auth links -->

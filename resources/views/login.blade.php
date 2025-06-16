@@ -38,7 +38,7 @@
                 >
             </div>
 
-            <div>
+           <div>
                 <button
                     type="submit"
                     class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md transition-colors"
@@ -46,6 +46,16 @@
                     Login
                 </button>
             </div>
+
+            <div>
+                <a
+                    href="{{ route('users.create') }}"
+                    class="block text-center w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md transition-colors"
+                >
+                    Register
+                </a>
+            </div>
+
         </form>
     </div>
 </div>
