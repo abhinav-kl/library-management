@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class BooksRental extends Model
 {
+    protected $table = 'books_rental';
+
     protected $fillable = [
         'book_id',
         'user_id',
