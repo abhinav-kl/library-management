@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('books_rental', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('books_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('users_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('book_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->enum('rental_status', ['requested', 'holding', 'returned'])->default('requested');
-            $table->integer('holding_period');
+            $table->timestamp('expected_return_date');
             $table->timestamp('returned_date');
             $table->timestamps();
         });
