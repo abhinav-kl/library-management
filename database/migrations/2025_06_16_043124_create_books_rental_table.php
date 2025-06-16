@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->enum('rental_status', ['requested', 'holding', 'returned'])->default('requested');
             $table->timestamp('expected_return_date');
-            $table->timestamp('returned_date');
+            $table->timestamp('returned_date')->nullable(true);
             $table->timestamps();
         });
     }
