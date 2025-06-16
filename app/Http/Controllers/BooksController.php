@@ -147,4 +147,23 @@ class BooksController extends Controller
     /**
      * now return function for the code
      */
+    public function returnForm(string $id)
+    {
+        $book = Books::where('id', '=', $id)->first();
+        return view('books.form', compact('book'));
+    }
+
+    public function returnBooks(Request $request, string $id)
+    {
+        $rental = BooksRental::where('id', '=', $id)->first();
+        $rental->update([
+            'returned_date' => Carbon::now()->toString(),
+        ]);
+
+        Books::update([
+            'availability' => true,
+        ]);
+
+        return redirect()->route('rentals.requested')->with('success', 'Book requested successfully.');
+    }
 }

@@ -23,6 +23,8 @@ Route::resource('users', UsersController::class);
 
 Route::post('/books/request/{id}', [BooksController::class, 'requestBooks'])->name('books.request');
 Route::get('/books/form/{id}', [BooksController::class, 'requestForm'])->name('books.form');
+Route::post('/books/return/{id}', [BooksController::class, 'returnBooks'])->name('books.return');
+Route::get('/books/return-form/{id}', [BooksController::class, 'returnForm'])->name('books.returnForm');
 
 Route::get('/rentals/index', [RentalBooksController::class, 'index'])->name('rentals.index');
 Route::get('/rentals/requested', [RentalBooksController::class, 'showRequested'])->name('rentals.requested');
