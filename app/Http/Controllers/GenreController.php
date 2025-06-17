@@ -9,6 +9,12 @@ use Illuminate\Routing\Controller;
 
 class GenreController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * This constructor applies the AuthCheck middleware to all methods in this controller,
+     * ensuring that only authenticated users can access the genre management features.
+     */
     public function __construct()
     {
         return $this->middleware(AuthCheck::class);

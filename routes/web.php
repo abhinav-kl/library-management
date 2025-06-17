@@ -26,6 +26,7 @@ Route::post('/books/request/{id}', [BooksController::class, 'requestBooks'])->na
 Route::get('/books/form/{id}', [BooksController::class, 'requestForm'])->name('books.form');
 Route::put('/books/return/{id}', [RentalBooksController::class, 'returnBooks'])->name('books.return');
 Route::put('/books/approve/{id}', [RentalBooksController::class, 'approveBooks'])->name('books.approve');
+Route::put('/books/reject/{id}', [RentalBooksController::class, 'rejectBooks'])->name('books.reject');
 Route::get('/books/search', [BooksController::class, 'search'])->name('books.search');
 
 

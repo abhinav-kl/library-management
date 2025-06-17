@@ -60,16 +60,27 @@
 
             @if (Auth::user()->user_type === 'ADM')
                 @if ($rental->rental_status === 'requested')
-                <form action="{{ route('books.approve', $rental->id) }}" method="post">
-                    @csrf
-                    @method('PUT')
-                    <div class="text-center">
-                        <button type="submit"
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-md transition duration-200">
-                            Approve
-                        </button>
+                    <div class="flex justify-center gap-4 mt-4">
+                        {{-- Approve Button --}}
+                        <form action="{{ route('books.approve', $rental->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <button type="submit"
+                                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-md transition duration-200 shadow-sm">
+                                ✅ Approve
+                            </button>
+                        </form>
+
+                        {{-- Reject Button --}}
+                        <form action="{{ route('books.reject', $rental->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <button type="submit"
+                                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-md transition duration-200 shadow-sm">
+                                ❌ Reject
+                            </button>
+                        </form>
                     </div>
-                </form>
                 @endif
             @else
                 @if ($rental->rental_status === 'holding')

@@ -11,11 +11,23 @@ use Illuminate\Routing\Controller;
 
 class RentalBooksController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * This constructor applies the AuthCheck middleware to all methods in this controller,
+     * ensuring that only authenticated users can access the book rental features.
+     */
     public function __construct()
     {
         return $this->middleware(AuthCheck::class);
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * This method retrieves all book rentals ordered by their creation date in descending order
+     * and returns them to the rental_books.index view.
+     */
     public function index()
     {
         $rentals = BooksRental::orderBy('created_at', 'desc')
@@ -24,6 +36,13 @@ class RentalBooksController extends Controller
         return view('rental_books.index', ['rentals' => $rentals]);
     }
 
+    /**
+     * Show the list of requested books.
+     *
+     * This method retrieves all book rentals that are currently requested,
+     * ordered by their creation date in descending order, and returns them
+     * to the rental_books.requested view.
+     */
     public function showRequested()
     {
         $rentals = BooksRental::where('rental_status', 'requested')
@@ -33,6 +52,13 @@ class RentalBooksController extends Controller
         return view('rental_books.requested', ['rentals' => $rentals]);
     }
 
+    /**
+     * Show the list of books that are currently on hold.
+     *
+     * This method retrieves all book rentals that are currently on hold,
+     * ordered by their creation date in descending order, and returns them
+     * to the rental_books.holding view.
+     */
     public function showHolding()
     {
         $rentals = BooksRental::where('rental_status', 'holding')
@@ -42,6 +68,13 @@ class RentalBooksController extends Controller
         return view('rental_books.holding', ['rentals' => $rentals]);
     }
 
+    /**
+     * Show the list of returned books.
+     *
+     * This method retrieves all book rentals that have been returned,
+     * ordered by their creation date in descending order, and returns them
+     * to the rental_books.returned view.
+     */
     public function showReturned()
     {
         $rentals = BooksRental::where('rental_status', 'returned')
@@ -51,6 +84,16 @@ class RentalBooksController extends Controller
         return view('rental_books.returned', ['rentals' => $rentals]);
     }
 
+    /**
+     * Approve a book rental request.
+     *
+     * This method retrieves all book rentals that are currently on hold,
+     * and updates the status of a specific rental request to 'holding'.
+     * It then returns the updated list of rentals to the rental_books.index view.
+     *
+     * @param string $id The ID of the rental request to approve.
+     */
+    // This method is used to approve a book rental request.
     public function approveBooks(string $id)
     {
         $rentals = BooksRental::where('rental_status', 'holding')
@@ -60,12 +103,15 @@ class RentalBooksController extends Controller
         $requests = BooksRental::where('id', '=', $id)
             ->where('rental_status', 'requested')
             ->first();
-
-
         if (!$requests) {
             // Optionally handle the case when the record is not found
             return redirect()->back()->with('error', 'Book rental request not found or already processed.');
         }
+
+        $books = Books::where('id', '=', $requests->book_id)->first();
+        $books->update([
+            'availability' => false,
+        ]);
 
         $requests->update([
             'rental_status' => 'holding'
@@ -74,8 +120,39 @@ class RentalBooksController extends Controller
         return view('rental_books.index', ['rentals' => $rentals]);
     }
 
+    public function rejectBooks(string $id)
+    {
+        $rentals = BooksRental::where('rental_status', 'holding')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $requests = BooksRental::where('id', '=', $id)
+            ->where('rental_status', 'requested')
+            ->first();
+
+        if (!$requests) {
+            // Optionally handle the case when the record is not found
+            return redirect()->back()->with('error', 'Book rental request not found or already processed.');
+        }
+
+        $books = Books::where('id', '=', $requests->book_id)->first();
+        $books->update([
+            'availability' => true,
+        ]);
+
+        $requests->delete();
+
+        return view('rental_books.index', ['rentals' => $rentals]);
+    }
+
     /**
-     * now return function for the code
+     * Reject a book rental request.
+     *
+     * This method retrieves all book rentals that are currently requested,
+     * and updates the status of a specific rental request to 'rejected'.
+     * It then returns the updated list of rentals to the rental_books.index view.
+     *
+     * @param string $id The ID of the rental request to reject.
      */
     public function returnBooks(Request $request, string $id)
     {
@@ -90,6 +167,6 @@ class RentalBooksController extends Controller
             'availability' => true,
         ]);
 
-        return redirect()->route('rentals.index')->with('success', 'Book requested successfully.');
+        return redirect()->route('rentals.index')->with('success', 'Book returned successfully.');
     }
 }

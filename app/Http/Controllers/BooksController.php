@@ -15,6 +15,12 @@ use Illuminate\Support\Facades\Auth;
 
 class BooksController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * This constructor applies the AuthCheck middleware to all methods in this controller,
+     * ensuring that only authenticated users can access the methods.
+     */
     public function __construct()
     {
         return $this->middleware(AuthCheck::class);
@@ -125,12 +131,28 @@ class BooksController extends Controller
         //
     }
 
+    /**
+     * Show the form for requesting a book.
+     *
+     * @param string $id
+     * @return \Illuminate\View\View
+     */
     public function requestForm(string $id)
     {
         $book = Books::where('id', '=', $id)->first();
         return view('books.form', compact('book'));
     }
 
+    /**
+     * Handle the book request.
+     *
+     * Validates the request, checks if the book is available,
+     * and creates a rental record if the book is available.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function requestBooks(Request $request, string $id)
     {
         $request->validate([
@@ -140,23 +162,34 @@ class BooksController extends Controller
         $book = Books::where('id', '=', $id)->first();
         $user = Auth::user();
 
-        BooksRental::firstOrCreate(
-            [
-                'book_id' => $book->id,
-                'user_id' => $user->id,
-            ],
-            [
+        $existingRental = BooksRental::where('book_id', '=', $book->id)
+            ->where('user_id',  '=', $user->id)
+            ->where('rental_status', 'returned')
+            ->first();
+
+        if (empty($existingRental)) {
+            BooksRental::firstOrCreate(
+                [
+                    'book_id' => $book->id,
+                    'user_id' => $user->id,
+                ],
+                [
+                    'expected_return_date' => Carbon::now()
+                        ->addDays((int) $request->input('days'))
+                        ->toDateString(),
+                    'returned_date' => null,
+                    'rental_status' => 'requested',
+                ]
+            );
+        } else {
+            $existingRental->update([
                 'expected_return_date' => Carbon::now()
                     ->addDays((int) $request->input('days'))
                     ->toDateString(),
                 'returned_date' => null,
                 'rental_status' => 'requested',
-            ]
-        );
-
-        $book->update([
-            'availability' => false,
-        ]);
+            ]);
+        }
 
         return redirect()->route('rentals.index')->with('success', 'Book requested successfully.');
     }
