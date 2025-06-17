@@ -3,12 +3,6 @@
 @section('content')
 
 <div class="max-w-4xl mx-auto p-6 space-y-6">
-    <div class="flex justify-between items-center mb-4">
-        <a href="{{ route('users.create') }}"
-            class="bg-indigo-900 text-white px-4 py-2 rounded-full text-sm hover:bg-indigo-700 transition">
-            Add Books
-        </a>
-    </div>
     <h1 class="text-2xl font-semibold text-gray-800">Users</h1>
     @foreach ($users as $user)
         <div class="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow duration-300">

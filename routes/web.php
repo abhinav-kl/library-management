@@ -6,6 +6,7 @@ use App\Http\Controllers\BooksController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\RentalBooksController;
 use App\Http\Controllers\UsersController;
+use App\Models\BooksRental;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -23,8 +24,10 @@ Route::resource('users', UsersController::class);
 
 Route::post('/books/request/{id}', [BooksController::class, 'requestBooks'])->name('books.request');
 Route::get('/books/form/{id}', [BooksController::class, 'requestForm'])->name('books.form');
-Route::post('/books/return/{id}', [BooksController::class, 'returnBooks'])->name('books.return');
-Route::get('/books/return-form/{id}', [BooksController::class, 'returnForm'])->name('books.returnForm');
+Route::put('/books/return/{id}', [RentalBooksController::class, 'returnBooks'])->name('books.return');
+Route::put('/books/approve/{id}', [RentalBooksController::class, 'approveBooks'])->name('books.approve');
+Route::get('/books/search', [BooksController::class, 'search'])->name('books.search');
+
 
 Route::get('/rentals/index', [RentalBooksController::class, 'index'])->name('rentals.index');
 Route::get('/rentals/requested', [RentalBooksController::class, 'showRequested'])->name('rentals.requested');
