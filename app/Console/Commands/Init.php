@@ -26,6 +26,7 @@ class Init extends Command
      */
     public function handle()
     {
+        // Run migrations and seed the database
         Artisan::call('migrate:fresh', [
             '--seed' => true
         ]);

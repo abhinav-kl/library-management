@@ -8,11 +8,23 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * This constructor applies the AuthCheck middleware to all methods in this controller,
+     * ensuring that only authenticated users can access the authentication features.
+     */
     public function showLoginForm()
     {
         return view('login');
     }
 
+    /**
+     * Handle the login request.
+     *
+     * Validates the incoming request, checks the user's credentials,
+     * and redirects to the books index if successful.
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -38,6 +50,12 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Handle the logout request.
+     *
+     * Logs out the user, invalidates the session, and regenerates the CSRF token.
+     * Redirects to the login page after logout.
+     */
     public function logout(Request $request)
     {
         Auth::logout();
