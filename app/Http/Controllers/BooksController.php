@@ -22,10 +22,27 @@ class BooksController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $books = Books::orderBy('book_name')->get();
-        return view('books.index', ['books' => $books]);
+        // $books = Books::orderBy('book_name')->get();
+        // return view('books.index', ['books' => $books]);
+        $query = $request->input('query');
+
+        $books = Books::query()->orderBy('book_name');
+
+        if ($query) {
+            $books->where('book_name', 'like', "%{$query}%")
+                ->orWhereHas('author', function ($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%");
+                })
+                ->orWhereHas('genre', function ($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%");
+                });
+        }
+
+        $books = $books->get();
+
+        return view('books.index', compact('books', 'query'));
     }
 
     /**
@@ -137,33 +154,10 @@ class BooksController extends Controller
             ]
         );
 
-        Books::update([
+        $book->update([
             'availability' => false,
         ]);
 
-        return redirect()->route('rentals.requested')->with('success', 'Book requested successfully.');
-    }
-
-    /**
-     * now return function for the code
-     */
-    public function returnForm(string $id)
-    {
-        $book = Books::where('id', '=', $id)->first();
-        return view('books.form', compact('book'));
-    }
-
-    public function returnBooks(Request $request, string $id)
-    {
-        $rental = BooksRental::where('id', '=', $id)->first();
-        $rental->update([
-            'returned_date' => Carbon::now()->toString(),
-        ]);
-
-        Books::update([
-            'availability' => true,
-        ]);
-
-        return redirect()->route('rentals.requested')->with('success', 'Book requested successfully.');
+        return redirect()->route('rentals.index')->with('success', 'Book requested successfully.');
     }
 }
