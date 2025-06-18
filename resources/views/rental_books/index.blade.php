@@ -62,7 +62,7 @@
                 @if ($rental->rental_status === 'requested')
                     <div class="flex justify-center gap-4 mt-4">
                         {{-- Approve Button --}}
-                        <form action="{{ route('books.approve', $rental->id) }}" method="POST">
+                        <form action="{{ route('rentals.approve', $rental->id) }}" method="POST">
                             @csrf
                             @method('PUT')
                             <button type="submit"
@@ -72,7 +72,7 @@
                         </form>
 
                         {{-- Reject Button --}}
-                        <form action="{{ route('books.reject', $rental->id) }}" method="POST">
+                        <form action="{{ route('rentals.reject', $rental->id) }}" method="POST">
                             @csrf
                             @method('PUT')
                             <button type="submit"
@@ -84,7 +84,7 @@
                 @endif
             @else
                 @if ($rental->rental_status === 'holding')
-                    <form action="{{ route('books.return', $rental->id) }}" method="post">
+                    <form action="{{ route('rentals.return', $rental->id) }}" method="post">
                         @csrf
                         @method('PUT')
                         <div class="text-center">

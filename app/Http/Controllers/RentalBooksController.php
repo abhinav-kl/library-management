@@ -5,23 +5,34 @@ namespace App\Http\Controllers;
 use App\Http\Middleware\AuthCheck;
 use App\Models\Books;
 use App\Models\BooksRental;
+use App\RouteContract;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Support\Facades\Route;
+use Symfony\Component\CssSelector\Node\FunctionNode;
 
-class RentalBooksController extends Controller
+class RentalBooksController extends Controller implements HasMiddleware, RouteContract
 {
-    /**
-     * Create a new controller instance.
-     *
-     * This constructor applies the AuthCheck middleware to all methods in this controller,
-     * ensuring that only authenticated users can access the book rental features.
-     */
-    public function __construct()
+    public static function middleware(): array
     {
-        return $this->middleware(AuthCheck::class);
+        return ['auth'];
     }
 
+    public static function routes(): void
+    {
+        Route::prefix('rentals')
+            ->controller(self::class)
+            ->group(function () {
+                Route::get('/index', [RentalBooksController::class, 'index'])->name('rentals.index');
+                Route::get('/requested', [RentalBooksController::class, 'showRequested'])->name('rentals.requested');
+                Route::get('/holding', [RentalBooksController::class, 'showHolding'])->name('rentals.holding');
+                Route::get('/returned', [RentalBooksController::class, 'showReturned'])->name('rentals.returned');
+                Route::put('/return/{id}', [RentalBooksController::class, 'returnBooks'])->name('rentals.return');
+                Route::put('/approve/{id}', [RentalBooksController::class, 'approveBooks'])->name('rentals.approve');
+                Route::put('/reject/{id}', [RentalBooksController::class, 'rejectBooks'])->name('rentals.reject');
+            });
+    }
     /**
      * Display a listing of the resource.
      *
@@ -116,6 +127,10 @@ class RentalBooksController extends Controller
         $requests->update([
             'rental_status' => 'holding'
         ]);
+
+        BooksRental::where('id', '!=', $id)
+            ->where('book_id', $requests->book_id)
+            ->delete();
 
         return view('rental_books.index', ['rentals' => $rentals]);
     }

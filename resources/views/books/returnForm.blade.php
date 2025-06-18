@@ -27,7 +27,7 @@
             </div>
         @endif
 
-        <form action="{{ route('books.return', $book->id) }}" method="POST" class="space-y-5">
+        <form action="{{ route('rentals.return', $book->id) }}" method="POST" class="space-y-5">
             @csrf
 
              {{-- Book Info --}}
