@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,23 +26,14 @@ class AuthController extends Controller
      * Validates the incoming request, checks the user's credentials,
      * and redirects to the books index if successful.
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required'],
-            'password' => ['required'],
-        ]);
-
-        $user = User::where('email', '=', $request->email)->first();
-        if (!$user) {
-            return back()->withErrors([
-                'message' => "User not found",
-            ]);
-        }
+        $credentials = $request->only('email', 'password');
 
         // here checking the logged in user and redirect to the the page of the user
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            $request->session()->regenerateToken();
             return redirect()->route('books.index');
         }
 

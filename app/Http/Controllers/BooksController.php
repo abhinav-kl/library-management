@@ -8,12 +8,14 @@ use App\Models\Books;
 use App\Models\BooksRental;
 use App\Models\Genres;
 use App\Models\User;
+use App\RouteContract;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
-class BooksController extends Controller
+class BooksController extends Controller implements HasMiddleware, RouteContract
 {
     /**
      * Create a new controller instance.
@@ -21,12 +23,26 @@ class BooksController extends Controller
      * This constructor applies the AuthCheck middleware to all methods in this controller,
      * ensuring that only authenticated users can access the methods.
      */
-    public function __construct()
+    public static function middleware(): array
     {
-        return $this->middleware(AuthCheck::class);
+        return ['auth'];
     }
+
+    public static function routes(): void
+    {
+        Route::prefix('books')
+            ->name('books.')
+            ->controller(self::class)
+            ->group(function () {
+                Route::resource('', BooksController::class);
+                Route::get('/search', [BooksController::class, 'search'])->name('search');
+                Route::post('/request/{id}', [BooksController::class, 'requestBooks'])->name('request');
+                Route::get('/form/{id}', [BooksController::class, 'requestForm'])->name('form');
+            });
+    }
+
     /**
-     * Display a listing of the resource.
+     *  Display a listing of the resource.
      */
     public function index(Request $request)
     {

@@ -5,20 +5,26 @@ namespace App\Http\Controllers;
 use App\Http\Middleware\AuthCheck;
 use App\Models\Authors;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use PharIo\Manifest\Author;
 
-class AuthorController extends Controller
+class AuthorController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            'auth',
+        ];
+    }
+
     /**
      * Create a new controller instance.
      *
      * This constructor applies the AuthCheck middleware to all methods in this controller,
      * ensuring that only authenticated users can access the author management features.
      */
-    public function __construct()
-    {
-        return $this->middleware(AuthCheck::class);
-    }
+    public function __construct() {}
+
     /**
      * Display a listing of the resource.
      */
@@ -61,9 +67,8 @@ class AuthorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Author $author)
     {
-        $author = Authors::where('id', '=', $id)->first();
         return view('authors.edit', compact('author'));
     }
 
