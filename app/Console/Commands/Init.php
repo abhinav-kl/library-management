@@ -30,5 +30,7 @@ class Init extends Command
         Artisan::call('migrate:fresh', [
             '--seed' => true
         ]);
+
+        Artisan::call('storage:link');
     }
 }
