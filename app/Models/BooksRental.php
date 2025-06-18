@@ -18,6 +18,14 @@ class BooksRental extends Model
         'returned_date',
     ];
 
+    protected function casts()
+    {
+        return [
+            'expected_return_date' => 'immutable_datetime',
+            'returned_date' => 'immutable_datetime',
+        ];
+    }
+
     public function books(): BelongsTo
     {
         return $this->belongsTo(Books::class, 'book_id', 'id');
